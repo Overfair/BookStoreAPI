@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace BookStoreAPI.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/")]
     [ApiController]
     public class BookController : ControllerBase
     {
@@ -19,13 +19,14 @@ namespace BookStoreAPI.Controllers
         {
             _dataContext = dataContext;
         }
-        [HttpGet]
+        [HttpGet("books")]
         public async Task<ActionResult<List<Book>>> Get()
         {
             return Ok(await _dataContext.Books.ToListAsync());
         }
 
-        [HttpGet("{Id}")]
+        [HttpGet("book/{Id}")]
+        
         public async Task<ActionResult<Book>> Get(int Id)
         {
             var book = await _dataContext.Books.FindAsync(Id);
@@ -36,7 +37,7 @@ namespace BookStoreAPI.Controllers
             return Ok(book);
         }
 
-        [HttpPost]
+        [HttpPost("book/add")]
         public async Task<ActionResult<List<Book>>> AddBook(Book book)
         {
             _dataContext.Books.Add(book);
@@ -44,9 +45,14 @@ namespace BookStoreAPI.Controllers
             return Ok(await _dataContext.Books.ToListAsync());
         }
 
-        [HttpPut]
-        public async Task<ActionResult<List<Book>>> UpdateBook(Book request)
+        [HttpPut("book/update/{Id}")]
+        public async Task<ActionResult<List<Book>>> UpdateBook(int Id, Book request)
         {
+            if (Id != request.Id)
+            {
+                return BadRequest("Book id mismatch");
+            }
+
             var book = await _dataContext.Books.FindAsync(request.Id);
             if (book == null)
             {
@@ -61,7 +67,7 @@ namespace BookStoreAPI.Controllers
             return Ok(book);
         }
 
-        [HttpDelete("{Id}")]
+        [HttpDelete("book/delete/{Id}")]
         public async Task<ActionResult<List<Book>>> DeleteBook(int Id)
         {
             var book = await _dataContext.Books.FindAsync(Id);
